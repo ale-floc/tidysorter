@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='tidysorter',
-    version='1.0.0',
+    version='1.0.2',
     author='Arnaud Le Floch',
     author_email='a.lefloch2491@gmail.com',
     description='A tool to organize files in a directory',
@@ -10,6 +10,6 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/ale-floc/tidysorter',
     packages=find_packages(),
-    entry_points={'console_scripts': ['tidysorter=tidysorter.main:main']},
+    entry_points={'console_scripts': ['tidysorter=tidysorter.tidysorter:main']},
     install_requires=[]
 )

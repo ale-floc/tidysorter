@@ -1,6 +1,3 @@
-import os
-import random
-
 FILE_TYPES = {
     'Documents': ['.pdf', '.docx', '.doc', '.txt', '.rtf', '.odt', '.md', '.tex', '.epub', '.pages'],
     'Spreadsheets': ['.xls', '.xlsx', '.ods', '.csv'],

@@ -4,10 +4,10 @@ import shutil
 import argparse
 import sys
 import logging
-from constants import FILE_TYPES
-from utils import print_red, print_yellow, print_green
+from .constants import FILE_TYPES
+from .utils import print_red, print_yellow, print_green
 
-__version__ = "1.0.0"
+__version__ = "1.0.2"
 
 # def get_system_user_directories():
 #     if platform.system() == 'Darwin':

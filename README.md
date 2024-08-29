@@ -3,8 +3,6 @@ TidySorter
 </h1>
 <p align="center">
 Effortlessly organize your files into neatly categorized folders, making it easier to prepare for system formatting or reinstallation, or simply to clean up cluttered directories filled with accumulated files. Compatible with macOS, Linux, and Windows.
-<br>
-Works on <b>macOS</b>, <b>Linux</b>, and <b>Windows</b>
 </p>
 
 ## Installation
@@ -12,9 +10,8 @@ Works on <b>macOS</b>, <b>Linux</b>, and <b>Windows</b>
 To install TidySorter, you have several options:
 
 **Install using `pip`**: This is the easiest method. Simply run:
-    ```console
-    $ python3 -m pip install --user tidysorter
-    ```
+```console
+$ pip install --user tidysorter
 
 ## Usage
 
