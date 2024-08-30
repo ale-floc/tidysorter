@@ -22,8 +22,6 @@ Once installed, you can use TidySorter directly from the command line. To get a 
 $ tidysorter --help
 usage: tidysorter.py [-h] [-f FOLDER] [-s] [-S] [-v] [source_folder]
 
-Effortlessly organize your files into neatly categorized folders, making it easier to prepare for system formatting or reinstallation, or simply to clean up cluttered directories filled with accumulated files. Compatible with macOS, Linux, and Windows.
-
 positional arguments:
   source_folder         The source folder to sort
 
