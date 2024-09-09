@@ -28,6 +28,7 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   -f  --folder          Custom name of the master folder
+  -q  --quiet           Suppress all console output (quiet mode)
   -s, --simulate        Enable simulation mode (no changes will be made)
   -S, --safe            Prevent deletion of empty folders and shortcut files. By default, empty folders and shortcut files will be removed during sorting.
   -v, --version         Display the version number
