@@ -7,7 +7,7 @@ import logging
 from .constants import FILE_TYPES
 from .utils import print_logic
 
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 GLOBAL_QUIET = False
 
 # def get_system_user_directories():
@@ -67,48 +67,54 @@ def organize_files(source_folder, simulation=False, recursive=False, custom_fold
     GLOBAL_QUIET = quiet
     master_folder = create_master_folder(source_folder, simulation, custom_folder_name)
     
-    for item_name in os.listdir(source_folder):
-        item_path = os.path.join(source_folder, item_name)
-        
-        if item_name == 'TidySorter':
-            continue
+    def process_folder(folder):
+        for item_name in os.listdir(folder):
+            item_path = os.path.join(folder, item_name)
 
-        if item_name.lower().endswith('.lnk'):
-            handle_shortcuts(item_name, item_path, simulation, safe, master_folder)
-            continue
+            if item_name == 'TidySorter':
+                continue
 
-        if os.path.isdir(item_path):
-            folder_path = os.path.join(master_folder, 'Folders')
-            if simulation:
-                print_logic(f'[SIMULATION] Folder "{item_name}" would be checked and potentially moved to {folder_path}', 'yellow', GLOBAL_QUIET)
-            else:
-                if remove_empty_dir(item_path):
-                    print_logic(f"Empty directory '{item_path}' deleted.", 'red', GLOBAL_QUIET)
+            if item_name.lower().endswith('.lnk'):
+                handle_shortcuts(item_name, item_path, simulation, safe, master_folder)
+                continue
+
+            if os.path.isdir(item_path):
+                folder_path = os.path.join(master_folder, 'Folders')
+                
+                if recursive:
+                    process_folder(item_path)
+
+                if simulation:
+                    print_logic(f'[SIMULATION] Folder "{item_name}" would be checked and potentially moved to {folder_path}', 'yellow', GLOBAL_QUIET)
                 else:
-                    if not os.path.exists(folder_path):
-                        os.makedirs(folder_path)
-                    shutil.move(item_path, os.path.join(folder_path, item_name))
-                    print_logic(f'Folder "{item_name}" moved to {folder_path}', 'green', GLOBAL_QUIET)
-            continue
-        
-        if os.path.isfile(item_path):
-            file_ext = os.path.splitext(item_name)[1].lower()
-            moved = False
-            for folder_name, extensions in FILE_TYPES.items():
-                if file_ext in extensions:
-                    folder_path = os.path.join(master_folder, folder_name)
-                    if simulation:
-                        print_logic(f'[SIMULATION] {item_name} would be moved to {folder_path}', 'yellow', GLOBAL_QUIET)
+                    if remove_empty_dir(item_path):
+                        print_logic(f"Empty directory '{item_path}' deleted.", 'red', GLOBAL_QUIET)
                     else:
                         if not os.path.exists(folder_path):
                             os.makedirs(folder_path)
                         shutil.move(item_path, os.path.join(folder_path, item_name))
-                        print_logic(f'{item_name} moved to {folder_path}', 'green', GLOBAL_QUIET)
-                    moved = True
-                    break
+                        print_logic(f'Folder "{item_name}" moved to {folder_path}', 'green', GLOBAL_QUIET)
+                continue
 
-            if not moved and simulation:
-                print_logic(f'[SIMULATION] {item_name} does not match any defined category.', 'yellow', GLOBAL_QUIET)
+            if os.path.isfile(item_path):
+                file_ext = os.path.splitext(item_name)[1].lower()
+                moved = False
+                for folder_name, extensions in FILE_TYPES.items():
+                    if file_ext in extensions:
+                        folder_path = os.path.join(master_folder, folder_name)
+                        if simulation:
+                            print_logic(f'[SIMULATION] {item_name} would be moved to {folder_path}', 'yellow', GLOBAL_QUIET)
+                        else:
+                            if not os.path.exists(folder_path):
+                                os.makedirs(folder_path)
+                            shutil.move(item_path, os.path.join(folder_path, item_name))
+                            print_logic(f'{item_name} moved to {folder_path}', 'green', GLOBAL_QUIET)
+                        moved = True
+                        break
+
+                if not moved and simulation:
+                    print_logic(f'[SIMULATION] {item_name} does not match any defined category.', 'yellow', GLOBAL_QUIET)
+    process_folder(source_folder)
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Effortlessly organize your files into neatly categorized folders, making it easier to prepare for system formatting or reinstallation, or simply to clean up cluttered directories filled with accumulated files. Compatible with macOS, Linux, and Windows.")
@@ -116,7 +122,7 @@ def main() -> None:
     parser.add_argument("-f", "--folder", type=str, help="Custom name of the master folder.")
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress all console output (quiet mode)")
     # parser.add_argument('-r', '--revert', action='store_true', help="Revert everything (requires log)")
-    # parser.add_argument("-R", "--recursive", action="store_true", help="Apply sorting recursively to subfolders")
+    parser.add_argument("-R", "--recursive", action="store_true", help="Apply sorting recursively to subfolders")
     parser.add_argument('-s', '--simulate', action='store_true', help='Enable simulation mode (no changes will be made)')
     parser.add_argument("-S", "--safe", action="store_true", help="Prevent deletion of empty folders and shortcut files. By default, empty folders and shortcut files will be removed during sorting.")
     parser.add_argument("-v", "--version", action="version", version=__version__, help="Display the version number")
@@ -124,18 +130,18 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    # if args.recursive:
-    #     try:
-    #         print("\033[93mWarning: You have selected recursive sorting. This will process all subdirectories.\033[0m")
-    #         confirmation = input("Do you want to continue? (y/yes to confirm): ").strip().lower()
+    if args.recursive:
+        try:
+            print_logic("Warning: You have selected recursive sorting. This will process all subdirectories.", 'yellow')
+            confirmation = input("Do you want to continue? (y / yes to confirm): ").strip().lower()
 
-    #         if confirmation not in ['y', 'yes']:
-    #             print("\033[91mOperation cancelled by the user.\033[0m")
-    #             sys.exit(1)
+            if confirmation not in ['y', 'yes']:
+                print_logic("Operation cancelled by the user.", 'red')
+                sys.exit(1)
         
-    #     except KeyboardInterrupt:
-    #         print("\n\033[91mOperation cancelled by the user via Ctrl+C.\033[0m")
-    #         sys.exit(1)
+        except KeyboardInterrupt:
+            print_logic("Operation cancelled by the user via Ctrl+C.", 'red')
+            sys.exit(1)
 
     if args.source_folder:
         print_logic(f"Processing folder: {args.source_folder}", '', args.quiet)
@@ -150,7 +156,7 @@ def main() -> None:
     organize_files(
         args.source_folder,
         simulation=args.simulate,
-        # recursive=args.recursive,
+        recursive=args.recursive,
         safe=args.safe,
         quiet=args.quiet,
         custom_folder_name=args.folder
