@@ -123,6 +123,7 @@ def organize_files(source_folder, simulation=False, recursive=False, custom_fold
 def main() -> None:
     parser = argparse.ArgumentParser(description="Effortlessly organize your files into neatly categorized folders, making it easier to prepare for system formatting or reinstallation, or simply to clean up cluttered directories filled with accumulated files. Compatible with macOS, Linux, and Windows.")
     parser.add_argument('source_folder', nargs='?', help="The source folder to sort")
+    # parser.add_argument('-c', '--copy', action='store_true', help="Copy files instead of moving them to the sorted folders.")
     parser.add_argument("-f", "--folder", type=str, help="Custom name of the master folder.")
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress all console output (quiet mode)")
     # parser.add_argument('-r', '--revert', action='store_true', help="Revert everything (requires log)")
@@ -132,6 +133,7 @@ def main() -> None:
     parser.add_argument("-v", "--version", action="version", version=__version__, help="Display the version number")
     # parser.add_argument('-w', '--without-log', action='store_true', help='Without logs')
     parser.add_argument('-z', '--zip', action='store_true', help="Compress files into ZIP archives based on their category.")
+    # parser.add_argument("--hard", action="store_true", help="Perform a forceful operation, skipping safety checks and confirmations.")
 
     args = parser.parse_args()
 
