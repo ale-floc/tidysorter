@@ -6,8 +6,9 @@ import sys
 import logging
 from .constants import FILE_TYPES
 from .utils import print_logic
+from .zip import zip_folders_by_type
 
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 GLOBAL_QUIET = False
 
 # def get_system_user_directories():
@@ -62,16 +63,17 @@ def handle_shortcuts(item_name, item_path, simulation, safe, master_folder):
         os.remove(item_path)
         print_logic(f'Shortcut file "{item_name}" deleted.', 'red', GLOBAL_QUIET)
 
-def organize_files(source_folder, simulation=False, recursive=False, custom_folder_name=None, safe=False, quiet=False):
+def organize_files(source_folder, simulation=False, recursive=False, custom_folder_name=None, safe=False, quiet=False, zip_folders=False):
     global GLOBAL_QUIET
     GLOBAL_QUIET = quiet
     master_folder = create_master_folder(source_folder, simulation, custom_folder_name)
+    master_folder_name = custom_folder_name if custom_folder_name else 'TidySorter'
     
     def process_folder(folder):
         for item_name in os.listdir(folder):
             item_path = os.path.join(folder, item_name)
 
-            if item_name == 'TidySorter':
+            if item_name == master_folder_name:
                 continue
 
             if item_name.lower().endswith('.lnk'):
@@ -115,6 +117,8 @@ def organize_files(source_folder, simulation=False, recursive=False, custom_fold
                 if not moved and simulation:
                     print_logic(f'[SIMULATION] {item_name} does not match any defined category.', 'yellow', GLOBAL_QUIET)
     process_folder(source_folder)
+    if zip_folders:
+        zip_folders_by_type(f"{source_folder}/{master_folder_name}", FILE_TYPES, GLOBAL_QUIET)
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Effortlessly organize your files into neatly categorized folders, making it easier to prepare for system formatting or reinstallation, or simply to clean up cluttered directories filled with accumulated files. Compatible with macOS, Linux, and Windows.")
@@ -127,6 +131,7 @@ def main() -> None:
     parser.add_argument("-S", "--safe", action="store_true", help="Prevent deletion of empty folders and shortcut files. By default, empty folders and shortcut files will be removed during sorting.")
     parser.add_argument("-v", "--version", action="version", version=__version__, help="Display the version number")
     # parser.add_argument('-w', '--without-log', action='store_true', help='Without logs')
+    parser.add_argument('-z', '--zip', action='store_true', help="Compress files into ZIP archives based on their category.")
 
     args = parser.parse_args()
 
@@ -159,7 +164,8 @@ def main() -> None:
         recursive=args.recursive,
         safe=args.safe,
         quiet=args.quiet,
-        custom_folder_name=args.folder
+        custom_folder_name=args.folder,
+        zip_folders=args.zip
     )
 
 if __name__ == "__main__":
